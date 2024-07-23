@@ -15,7 +15,6 @@ class Administrativ(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-
     @nextcord.slash_command()
     async def help(self, interaction):
         embed = nextcord.Embed(

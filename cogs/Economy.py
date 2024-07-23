@@ -4,7 +4,10 @@ from nextcord.ext import commands
 from nextcord.ui import View, Select
 
 from handler.data_handler import user_exist, create_user, delete_user, get_balance
-from handler.error_handler import get_unable_message, get_error_msg, get_confirm_failed_message
+from handler.error_handler import (get_error_unable, get_error_msg, get_error_confirm_failed,
+                                   get_error_missing_bank_account, get_error_bank_account_exist)
+from handler.message_handler import (get_message_bank_account_was_created,
+                                     get_message_bank_account_was_deleted, get_message_balance)
 
 dollar_icon = "💵"
 bank_icon = "🏦"
@@ -32,29 +35,18 @@ class Economy(commands.Cog):
 
         async def callback(interaction):
             if interaction.user.id != main_interaction.user.id:
-                await interaction.response.send_message(get_unable_message(), ephemeral=True)
+                await interaction.response.send_message(get_error_unable(), ephemeral=True)
                 return
             if check.values[0].startswith("Create"):
                 if user_exist(interaction.user.id):
-                    await interaction.response.send_message(embed=nextcord.Embed(
-                        title="You already set up a bank account.",
-                        color=color_red,
-                        timestamp=datetime.datetime.now()),
-                                                            ephemeral=True)
+                    await interaction.response.send_message(embed=get_error_bank_account_exist(), ephemeral=True)
                     return
                 create_user(interaction.user.id)
-                embed = nextcord.Embed(title="Your bank account was created.",
-                                       color=color_green,
-                                       timestamp=datetime.datetime.now())
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                await interaction.response.send_message(embed=get_message_bank_account_was_created(), ephemeral=True)
 
             elif check.values[0].startswith("Delete"):
                 if not user_exist(interaction.user.id):
-                    await interaction.response.send_message(embed=nextcord.Embed(
-                        title="You have not set up a bank account yet.",
-                        color=color_red,
-                        timestamp=datetime.datetime.now()),
-                                                            ephemeral=True)
+                    await interaction.response.send_message(embed=get_error_missing_bank_account(), ephemeral=True)
                     return
 
                 class ConfirmationModal(nextcord.ui.Modal):
@@ -71,29 +63,20 @@ class Economy(commands.Cog):
 
                     async def callback(self, modal_interaction):
                         if not self.confirmation.value == "CONFIRM":
-                            await modal_interaction.response.send_message(embed=get_confirm_failed_message(),
+                            await modal_interaction.response.send_message(embed=get_error_confirm_failed(),
                                                                           ephemeral=True)
                             return
                         delete_user(interaction.user.id)
-                        await modal_interaction.response.send_message(embed=nextcord.Embed(
-                            title="Your bank account was deleted.",
-                            color=color_green,
-                            timestamp=datetime.datetime.now()
-                        ),
+                        await modal_interaction.response.send_message(embed=get_message_bank_account_was_deleted(),
                                                                       ephemeral=True)
                 await interaction.response.send_modal(ConfirmationModal())
 
             elif check.values[0].startswith("Check"):
                 if not user_exist(interaction.user.id):
-                    await interaction.response.send_message(embed=get_unable_message(), ephemeral=True)
+                    await interaction.response.send_message(embed=get_error_missing_bank_account(), ephemeral=True)
                     return
-                embed = nextcord.Embed(
-                    title="Your balance",
-                    description=f"You have {get_balance(interaction.user.id)} {dollar_icon} in your account",
-                    color=color_blue,
-                    timestamp=datetime.datetime.now()
-                )
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                balance = get_balance(interaction.user.id)
+                await interaction.response.send_message(embed=get_message_balance(balance), ephemeral=True)
 
             else:
                 await interaction.response.send_message(embed=get_error_msg())

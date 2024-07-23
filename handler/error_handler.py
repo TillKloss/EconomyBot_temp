@@ -17,7 +17,7 @@ def get_error_msg():
     )
 
 
-def get_unable_message():
+def get_error_unable():
     return nextcord.Embed(
         title="You can't do that.",
         color=color_red,
@@ -25,9 +25,33 @@ def get_unable_message():
     )
 
 
-def get_confirm_failed_message():
+# ---------------------ECONOMY SECTION---------------------
+def get_error_confirm_failed():
     return nextcord.Embed(
         title="Confirmation failed.",
         color=color_red,
         timestamp=datetime.datetime.now()
     )
+
+
+def get_error_missing_bank_account():
+    return nextcord.Embed(
+        title="You have not set up a bank account yet.",
+        color=color_red,
+        timestamp=datetime.datetime.now())
+
+
+def get_error_bank_account_exist():
+    return nextcord.Embed(
+                        title="You already set up a bank account.",
+                        color=color_red,
+                        timestamp=datetime.datetime.now())
+
+
+# ---------------------EARNINGS SECTION---------------------
+def get_error_daily_failed(time_left):
+    return nextcord.Embed(
+        title="You have already claimed your daily rewards.",
+        description=f"You can claim your daily rewards in {time_left}.",
+        color=color_red,
+        timestamp=datetime.datetime.now())
