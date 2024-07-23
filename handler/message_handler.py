@@ -25,7 +25,7 @@ def get_message_bank_account_was_deleted():
 
 
 def get_message_balance(balance):
-    nextcord.Embed(
+    return nextcord.Embed(
         title="Your balance",
         description=f"You have {balance} {dollar_icon} in your bank account.",
         color=color_blue,

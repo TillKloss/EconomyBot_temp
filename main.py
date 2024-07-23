@@ -12,7 +12,7 @@ async def on_ready():
 
 
 async def status_task():
-    await client.change_presence(activity=nextcord.Game("2nd Chance"), status=nextcord.Status.online)
+    await client.change_presence(activity=nextcord.Game("EconomyBot"), status=nextcord.Status.online)
 
 
 if __name__ == "__main__":
